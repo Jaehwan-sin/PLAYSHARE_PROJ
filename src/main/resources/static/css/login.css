@@ -1,0 +1,121 @@
+body {
+    font-family: "Apple SD Gothic Neo", sans-serif;
+    color: white;
+    background-color: black;
+    margin: 0; /* Body의 기본 margin 제거 */
+    padding: 0; /* Body의 기본 padding 제거 */
+    width: 1720px;
+    margin-left: auto;
+    margin-right: auto;
+    height: auto;
+    margin-top: 100px;
+    margin-bottom: 100px;
+}
+.center_parent {
+    text-align: center;
+}
+.center_text {
+    text-align: left;
+    display: inline-block;
+    font-size: 60px;
+}
+.login {
+    text-align: center;
+}
+.email {
+    margin-left: -260px;
+    font-size: 24px;
+}
+.password {
+    margin-left: -290px;
+    margin-top: 20px;
+    font-size: 24px;
+}
+.circle {
+    width: 400px;
+    height: 80px;
+    background-color: white;
+    margin-left: 670px;
+    margin-top: 10px;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+.email-input {
+    text-align: left;
+    width: 85%;
+    margin-left: -40px;
+    padding: 8px;
+    font-size: 24px;
+    border: none;
+    border-radius: 8px;
+    margin-top: 18px;
+}
+.next button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    outline: none;
+    text-align: center;
+    font-size: 32px;
+    font-weight: bold;
+    color: black;
+    margin-left: auto;
+    margin-right: auto;
+}
+.final_text {
+    text-align: center;
+    font-size: 28px;
+    margin-top: 30px;
+    margin-left: 20px;
+    color: white;
+}
+.final_text a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+}
+.login_btn, .google_login_btn, .naver_login_btn, .kakao_login_btn {
+    width: 400px;
+    height: 80px;
+    margin-left: 670px;
+    margin-top: 10px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.login_btn {
+    background-color: #1ED760;
+}
+.google_login_btn {
+    background-color: white;
+}
+.google_login_btn img {
+    width: 40px;
+    height: 40px;
+    margin-right: 5px;
+}
+.google_login_btn a,
+.naver_login_btn a,
+.kakao_login_btn a  {
+    color: black;
+    text-decoration: none;
+}
+.naver_login_btn {
+    background-color: #1EC800;
+}
+.naver_login_btn img {
+    width: 40px;
+    height: 40px;
+    margin-right: 5px;
+}
+.kakao_login_btn {
+    background-color: #FEE500;
+}
+.kakao_login_btn img {
+    width: 40px;
+    height: 40px;
+    margin-right: 5px;
+}

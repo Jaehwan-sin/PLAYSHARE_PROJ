@@ -1,0 +1,75 @@
+body {
+        font-family: "Apple SD Gothic Neo", sans-serif;
+        color: white;
+        background-color: black;
+        margin: 0; /* Body의 기본 margin 제거 */
+        padding: 0; /* Body의 기본 padding 제거 */
+        width: 1720px;
+        margin-left: auto;
+        margin-right: auto;
+        height: auto;
+        margin-top: 100px;
+        margin-bottom: 100px;
+    }
+    .center_parent {
+        text-align: center;
+    }
+    .center_text {
+        text-align: left;
+        display: inline-block;
+        font-size: 60px;
+    }
+    .login {
+        text-align: center;
+    }
+    .email {
+        margin-left: -260px;
+        font-size: 24px;
+    }
+    .circle, .circle_2, .circle_3 {
+        width: 400px;
+        height: 80px;
+        background-color: white;
+        margin-left: 670px;
+        margin-top: 10px;
+        border-radius: 20px;
+    }
+    .email-input {
+        text-align: left;
+        /* width: 80%; */
+        margin-left: -70px;
+        padding: 8px;
+        font-size: 24px;
+        border: none;
+        border-radius: 8px;
+        margin-top: 18px;
+    }
+    .circle_2 {
+        background-color: #1ED760;
+    }
+    .next {
+        font-size: 32px;
+        font-weight: bold;
+        text-align: center;
+        width: 400px;
+        margin-top: 20px;
+        color: black;
+        background-color: transparent; /* 배경 색상 초기화 */
+        border: none; /* 테두리 제거 */
+        cursor: pointer;
+    }
+    .final_text {
+        text-align: center;
+        font-size: 24px;
+        margin-top: 40px;
+        margin-left: 20px;
+        color: white;
+    }
+    .bold {
+        font-weight: bold;
+    }
+    a, a:visited {
+        color: inherit; /* 링크 색상을 상위 요소에서 상속받음 */
+        text-decoration: none; /* 밑줄 제거 */
+        cursor: pointer; /* 커서 스타일 변경 */
+    }

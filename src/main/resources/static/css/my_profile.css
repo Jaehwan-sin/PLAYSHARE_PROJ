@@ -1,0 +1,112 @@
+body {
+    font-family: "Apple SD Gothic Neo", sans-serif;
+    color: white;
+    background-color: black;
+    margin: 0;
+    padding: 0;
+    width: 1720px;
+    margin-left: auto;
+    margin-right: auto;
+    height: auto;
+    margin-top: 100px;
+    margin-bottom: 100px;
+}
+.my_menu ::before{
+    font-family: 'Material Icons';
+    font-size: 1.5em;
+    float: left;
+    clear: left;
+}
+.my_menu label::before{ content: '\e5d2'; }
+.my_menu li:nth-child(1) a::before{ content: '\f02e'; }
+.my_menu li:nth-child(2) a::before{ content: '\e8d6'; }
+.my_menu li:nth-child(3) a::before{ content: '\e88a'; }
+#expand-menu { /* 체크박스 폼 요소 감춤 */
+    display: none;
+}
+#expand-menu:checked ~ ul { /* 체크박스 체크되었으면 메뉴 목록 표시 - 반응형 표시용 */
+    display: block;
+    height: auto;
+}
+.my_menu {
+    font-family: "Apple SD Gothic Neo", sans-serif;
+    display: block;
+    width: 250px;
+    background-color: #000;
+    color: white;
+    border-radius: 20px;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow: hidden; /* 반응형 애니메이션용 */
+    transition: all 0.5s ease; /* 반응형 애니메이션 */
+}
+.my_menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.my_menu a, .my_menu > label {
+    display: block;
+    height: 25px;
+    padding: 8px;
+    cursor: pointer;
+    color: #fff;
+    text-decoration: none;
+}
+.my_menu a:hover {
+    color: #000;
+}
+.my_menu ul li:hover, .my_menu > label:hover {
+    background-color: #fff;
+    color: #000;
+    border-radius: 10px;
+}
+.my_menu div {
+    line-height: 1.5;
+    font-size: 1em;
+    font-family: 'Apple SD Gothic Neo", sans-serif';
+    padding: 0 0 0 50px; /* 아이콘과 텍스트 사이 여백 */
+}
+.container {
+    display: flex; /* 유연한 박스 모델을 사용하여 자식 요소들을 가로로 배치 */
+    height: 100%; /* 부모 요소에 대한 높이 100% 설정 */
+}
+.main-container {
+    flex: 1; /* 남은 공간을 모두 차지 */
+    background-color: white;
+    color: black;
+    min-height: 700px;
+    height: auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+table {
+    font-family: "Apple SD Gothic Neo", sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 20px;
+    background-color : white;
+    color : black;
+}
+th, td {
+    border: none; /* 세로선 없애기 */
+    border-bottom: 1px solid #ddd; /* 가로선은 남기기 */
+    padding: 20px;
+    text-align: left;
+}
+th {
+    background-color: #f2f2f2;
+    font-size: 24px;
+    font-weight: bold;
+}
+td:first-child {
+    width: 20%;
+}
+button {
+    padding: 10px;
+    margin-left: 50px;
+    font-size: 18px;
+    border-radius: 10px;
+    background-color: light grey;
+    color: black;
+}

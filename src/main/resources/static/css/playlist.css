@@ -1,0 +1,180 @@
+body {
+    font-family: "Apple SD Gothic Neo", sans-serif;
+    color: white;
+    background-color: black;
+    margin: 0; /* Body의 기본 margin 제거 */
+    padding: 0; /* Body의 기본 padding 제거 */
+    width: 1720px;
+    margin-left: auto;
+    margin-right: auto;
+    height: auto;
+    margin-top: 100px;
+    margin-bottom: 100px;
+}
+.intro_text {
+    font-size: 48px;
+    text-align: center;
+    font-weight: bold;
+}
+.white_background {
+    margin-top: 50px;
+    padding-bottom: 100px;
+    min-height: 600px;
+    height: auto;
+    background-color: white;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-direction: column;
+}
+.playlist_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+.playlist {
+    font-size: 48px;
+    font-weight: bold;
+    margin-left: 40px;
+    margin-top: 60px;
+    color: black;
+}
+.add_playlist_button {
+    background-color: #000;
+    color: #fff;
+    border-radius: 20px;
+    margin-top: 60px;
+    margin-left: 1200px;
+    padding: 10px 20px;
+    font-size: 24px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+}
+.underline {
+    border: 1px solid grey;
+    width: 1600px;
+    margin: 0 auto;
+}
+.album_cover {
+    display: flex;
+    margin-top: 20px;
+    margin-left: 60px;
+}
+.playlist_id, .playlist_desc {
+    font-size: 24px;
+    font-weight: lighter;
+}
+.playlist_name {
+    font-weight: bold;
+    font-size: 32px;
+}
+.playlist_id,
+.playlist_name,
+.playlist_desc {
+    color: black;
+}
+a {
+    text-decoration: none;
+    color: white;
+}
+.playlist_info_container {
+    display: flex;
+    flex-direction: column;
+    margin-left: 20px;
+}
+.playlist_text {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+}
+.empty_playlist {
+    font-size : 24px;
+    font-weight : bold;
+    margin: 0 auto;
+    text-align : center;
+    color : black;
+}
+
+/* 페이징 및 검색 스타일 */
+.pagination-search-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+}
+
+.pagination-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.pagination {
+    display: inline-block;
+}
+
+.pagination li {
+    display: inline;
+    margin-right: 5px;
+}
+
+.pagination li a {
+    color: black;
+    padding: 8px 16px;
+    text-decoration: none;
+}
+
+.pagination li.disabled {
+    pointer-events: none;
+    color: #808080;
+}
+
+.pagination li.active {
+    background-color: #007bff;
+    color: white;
+}
+
+/* 플레이리스트 목록 스타일 */
+.playlist-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.playlist-container ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.playlist-container li {
+    display: inline-block;
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.search {
+    display: flex;
+    align-items: center;
+    margin-right: 80px;
+}
+
+#search_text {
+    font-size: 16px;
+    width: 240px;
+    height: 30px;
+    padding: 5px;
+    margin-right: 10px;
+}
+
+#search_btn {
+    font-size: 16px;
+    background-color: black;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    width: 80px;
+    height: 42px;
+}
