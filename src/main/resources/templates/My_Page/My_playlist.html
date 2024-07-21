@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../../static/css/header.css">
+    <link rel="stylesheet" href="../../static/css/footer.css">
+    <link rel="stylesheet" href="../../static/css/my_playlist.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>등록한 플레이리스트</title>
+</head>
+
+<body>
+<div th:replace="fragments/header :: header"/>
+
+    <div class="container">
+        <div class="my_menu">
+            <label for="expand-menu"><div>메뉴</div></label>
+            <input type="checkbox" id="expand-menu" name="expand-menu">
+            <ul>
+                <li><a href="/My_Page/My_profile" class="item"><div>프로필</div></a></li>
+                <li><a href="/My_Page/My_playlist" class="item"><div>등록한 플레이리스트</div></a></li>
+                <li><a href="/My_Page/My_like" class="item"><div>좋아요</div></a></li>
+            </ul>
+    </div>
+
+<div class="main-container">
+    <div class="playlist_header">
+        <span class="playlist" th:text="${LoginUserName + '님이 등록한 플레이리스트'}"></span>
+    </div>
+    <div class="underline"></div>
+
+    <div th:if="${#lists.isEmpty(playlistPage)}">
+        <p class="playlist_empty_text">등록된 플레이리스트가 없습니다.</p>
+    </div>
+
+    <div th:each="playlist : ${playlistList}" class="album_cover">
+        <a th:href="@{'/user/playlist_detail/' + ${playlist.id}}">
+            <img th:src="${playlist.thumbnail}" alt="Thumbnail Image"  width="200" height="200"/>
+        </a>
+        <div class="text_info">
+            <div class="playlist_name" th:text="${playlist.title}"></div>
+            <div class="playlist_desc" th:text="${playlist.description}"></div>
+            <a href="" role="button" class="playlist_delete" th:attr="data-playlistId=${playlist.id}" onclick="confirmPlaylistDelete(this)">삭제</a>
+        </div>
+    </div>
+
+    <!-- 페이징 -->
+    <div class="pagination-container">
+        <div th:if="${playlistPage != null}">
+            <nav th:if="${playlistPage.totalPages > 1}" aria-label="Page navigation">
+                <ul class="pagination">
+                    <li th:class="${playlistPage.first} ? 'disabled' : ''" class="page-item">
+                        <a class="page-link" th:href="@{/My_Page/My_playlist(page=${playlistPage.number - 1})}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">이전</span>
+                        </a>
+                    </li>
+
+                    <li th:each="page: ${#numbers.sequence(0, playlistPage.totalPages - 1)}" th:classappend="${page == playlistPage.number} ? 'active'" class="page-item">
+                        <a class="page-link" th:href="@{/My_Page/My_playlist(page=${page})}" th:text="${page + 1}"></a>
+                    </li>
+
+                    <li th:class="${playlistPage.last} ? 'disabled' : ''" class="page-item">
+                        <a class="page-link" th:href="@{/My_Page/My_playlist(page=${playlistPage.number + 1})}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">다음</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+        </div>
+    </div>
+
+<div th:replace="fragments/footer :: footer"/>
+
+</body>
+
+<script>
+    function confirmPlaylistDelete(deleteButton) {
+        console.log('confirmPlaylistDelete 함수 호출 확인');
+        var playlistId = deleteButton.getAttribute('data-playlistId');
+
+        var confirmation = confirm("플레이리스트를 삭제하시겠습니까?");
+
+        if (confirmation) {
+            playlist_delete(playlistId);
+        } else {
+            alert("플레이리스트 삭제가 취소되었습니다.");
+        }
+    }
+
+    function playlist_delete(playlistId) {
+        $.ajax({
+            type: 'DELETE',
+            url: '/api/My_Page/playlists/' + playlistId,
+            data: JSON.stringify({
+                    playlistId: playlistId,
+                }),
+            success: function(response) {
+                alert("플레이리스트가 삭제되었습니다.");
+                location.reload(true); 
+            },
+            error: function(error) {
+                alert("삭제 도중 문제가 발생하였습니다.");
+                location.reload(true);
+            }
+        });
+    }
+</script>
+</html>

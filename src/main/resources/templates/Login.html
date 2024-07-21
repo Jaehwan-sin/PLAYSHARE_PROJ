@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link rel="stylesheet" href="../static/css/login.css">
+    <title>Login</title>
+</head>
+
+<body>
+    <div class="center_parent">
+        <h2 class="center_text">원하는<br>플레이리스트를<br>감상하세요</h2>
+    </div>
+
+    <div th:if="${error}" class="error-message">
+        <p id="error" th:text="${error}"></p>
+    </div>
+
+    <form id="loginForm">
+        <div class="login">
+            <div class="email">이메일 주소</div>
+            <div class="circle">
+                <input type="text" class="email-input" name="email" placeholder="이메일을 입력하세요">
+            </div>
+            <div class="password">비밀번호</div>
+            <div class="circle">
+                <input type="password" class="email-input" name="password">
+            </div>
+        </div>
+        <div class="login_btn">
+            <div class="next"><button type="submit">로그인</button></div>
+        </div>
+        <div class="google_login_btn">
+            <img src="../static/images/google.png" alt="google">
+            <div class="next"><button type="submit"><a href="/oauth2/authorization/google">구글로 로그인하기</a></button></div>
+        </div>
+        <div class="naver_login_btn">
+            <img src="../static/images/naver.PNG" alt="naver">
+            <div class="next"><button type="submit"><a href="/oauth2/authorization/naver">네이버로 로그인하기</a></button></div>
+        </div>
+        <div th:if="${param.error}" id="error-message" style="display:none;">
+            로그인 실패했습니다. 다시 시도해주세요.
+        </div>
+    </form>
+
+    <div class="final_text">
+        <div class="bold">계정이 없으신가요?</div>
+        <a href="/user/new">회원가입 후 이용해보세요.</a>
+    </div>
+
+</body>
+
+<script>
+    $(document).ready(function() {
+        $("#loginForm").submit(function(event) {
+            event.preventDefault();
+
+            var formData = {
+                email: $("input[name=email]").val(),
+                password: $("input[name=password]").val()
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/api/user/login",
+                data: JSON.stringify(formData),
+                contentType: "application/json",
+                dataType: "json",
+                success: function(response) {
+                    if (response.message === "Login successful") {
+                        window.location.href = "/main";
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert("로그인 실패했습니다. 다시 시도해주세요.");
+                }
+            });
+        });
+    });
+
+    $(document).ready(function() {
+        var errorMessage = $('#error-message').text();
+        if (errorMessage) {
+            alert(errorMessage);
+        }
+    });
+</script>
+
+</html>

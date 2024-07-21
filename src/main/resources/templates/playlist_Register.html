@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/header.css">
+    <link rel="stylesheet" href="../static/css/footer.css">
+    <link rel="stylesheet" href="../static/css/playlist_register.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <title>플레이리스트 등록</title>
+</head>
+
+<body>
+
+<div th:replace="fragments/header :: header"/>
+    <div class="main-container">
+        <span class="intro_text">자신의 취향의 음악을<br>공유해주세요</span>
+        <div class="white_background">
+            <div class="playlist_header">
+                <span class="playlist">Playlist</span>
+            </div>
+            <div class="underline"></div>
+                <div class="album_cover">
+                    <img id="playlistCoverImage" src="" alt="" width="200" height="200">
+                    <div class="playlist_name" id="p_title"><input type="text" placeholder="플레이리스트 제목을 입력하세요"></div>
+                    <div class="playlist_desc"><textarea name="playlist_desc" id="p_desc" cols="" rows="" placeholder="플레이리스트 설명을 입력하세요"></textarea></div>
+                </div>
+            <div class="underline2"></div>
+            <div class="search">
+                <img src="../static/images/search.png" alt="search" class="search_img" id="searchButton" onclick="searchSpotify()">
+                <input type="text" placeholder="가수 / 제목을 입력하세요" id="searchInput" onkeydown="handleSearch(event)">
+            </div>
+            <div class="underline3"></div>
+            <ul id="results"></ul>
+            <div class="pagination" id="pagination">
+                <button onclick="previousPage()">이전</button>
+                <span id="currentPage">1</span>
+                <button onclick="nextPage()">다음</button>
+            </div>
+
+            <!-- 플레이리스트 추가 -->
+            <div class="playlist_track">
+
+                <div class="underline3"></div>
+                <ul class="album_info">
+                    <li class="id">#</li>
+                    <li class="title" id="pl_title">제목</li>
+                    <li class="album" id="pl_album">앨범</li>
+                    <li class="add_date">추가한 날짜</li>
+                    <li class="time">재생시간</li>
+                </ul>
+                
+            </div>
+                <span class="hashtag_text">플레이리스트와 어울리는 해시태그를 선택해주세요</span>
+                    <div class="chkbox_and_btn">
+                        <label class="checkbox_group">
+                            <input type="checkbox" name="K-POP" id="K-POP">
+                                <label for="K-POP">K-POP</label>
+                            <input type="checkbox" name="J-POP" id="J-POP">
+                                <label for="J-POP">J-POP</label>
+                            <input type="checkbox" name="POP" id="POP">
+                                <label for="POP">POP</label>
+                            <input type="checkbox" name="발라드" id="발라드">
+                                <label for="발라드">발라드</label>
+                            <input type="checkbox" name="락" id="락">
+                                <label for="락">락</label> <br>
+                            <input type="checkbox" name="힙합" id="힙합">
+                                <label for="힙합">힙합</label>
+                            <input type="checkbox" name="인디" id="인디">
+                                <label for="인디">인디</label>
+                            <input type="checkbox" name="클래식" id="클래식">
+                                <label for="클래식">클래식</label>
+                            <input type="checkbox" name="재즈" id="재즈">
+                                <label for="재즈">재즈</label>
+                            <input type="checkbox" name="레게" id="레게">
+                                <label for="레게">레게</label>
+                        </label> <br>
+                    </div>
+                    <button class="playlist_register_btn" onclick="submitForm()">플레이리스트 등록하기</button>
+        </div>
+    </div>
+
+<div th:replace="fragments/footer :: footer"/>
+
+    <script>
+        let currentPage = 1;
+        const itemsPerPage = 14;
+        let accessToken = '';
+
+        function handleSearch(event) {
+            if (event.key === 'Enter') {
+                searchSpotify();
+            }
+        }
+
+        function searchSpotify() {
+            const searchInput = encodeURIComponent(document.getElementById('searchInput').value);
+            const searchResultsContainer = $('#results');
+            const clientId = 'de7ba1a62d644bd3b1f8e063580cb737';
+            const clientSecret = 'ba0bccc3e1d24bcfb6be5693848f3d76';
+            const tokenUrl = 'https://accounts.spotify.com/api/token';
+            const searchQuery = encodeURIComponent($('#searchInput').val());
+            const offset = (currentPage - 1) * itemsPerPage;
+            const spotifyApiUrl = `https://api.spotify.com/v1/search?q=${searchQuery}&type=track&limit=${itemsPerPage}&offset=${offset}`;
+
+            $.ajax({
+                url: tokenUrl,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': 'Basic ' + btoa(clientId + ':' + clientSecret),
+                },
+                data: {
+                    'grant_type': 'client_credentials'
+                },
+                success: function (tokenResponse) {
+                    accessToken = tokenResponse.access_token;
+                    $.ajax({
+                        url: spotifyApiUrl,
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`
+                        },
+                        success: function (response) {
+                            displayResults(response.tracks.items);
+
+                            // 검색 결과가 있으면 pagination을 표시
+                            if (response.tracks.items.length > 0) {
+                                $('.pagination').show();
+                            } else {
+                                $('.pagination').hide();
+                            }
+                        },
+                        error: function (error) {
+                            console.error('Error fetching Spotify data:', error);
+                        }
+                    });
+                },
+                error: function (error) {
+                    console.error('Error fetching Spotify access token:', error);
+                }
+            });
+        }
+
+        function displayResults(tracks) {
+            const resultsList = $('#results');
+            resultsList.empty();
+
+            tracks.forEach(function (track) {
+                const listItem = $('<li>').addClass('result-item');
+                const albumCover = $('<img>').attr('src', track.album.images[0].url).attr('alt', 'Album Cover');
+                const albumInfo = $('<div>').addClass('album-info');
+                albumInfo.append($('<p>').text(`Track: ${track.name}`));
+                albumInfo.append($('<p>').text(`Artist: ${track.artists[0].name}`));
+                albumInfo.append($('<p>').text(`Duration: ${msToTime(track.duration_ms)}`));
+                listItem.append(albumCover);
+                listItem.append(albumInfo);
+                listItem.append($('<button>').text('+').click(function () {
+                    addToPlaylist(track);
+                }));
+                resultsList.append(listItem);
+            });
+
+            updatePagination();
+        }
+
+        function nextPage() {
+            currentPage++;
+            searchSpotify();
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                searchSpotify();
+            }
+        }
+
+        function updatePagination() {
+            $('#currentPage').text(currentPage);
+        }
+
+        function msToTime(duration) {
+            let seconds = Math.floor((duration / 1000) % 60);
+            let minutes = Math.floor((duration / (1000 * 60)) % 60);
+            return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+        }
+
+        function addToPlaylist(track) {
+            const playlistTrack = $('.playlist_track');
+            
+            // 새로운 번호를 얻기 위한 변수
+            const currentNumber = playlistTrack.children('.playlist_item').length + 1;
+
+            const playlistItem = $('<div>').addClass('playlist_item');
+
+            playlistItem.append($('<span>').text(currentNumber).addClass('playlist_number')); // 현재 번호
+            playlistItem.append($('<img>').attr('src', track.album.images[0].url).attr('alt', 'Album Cover').addClass('album_cover').width(70).height(70));
+            playlistItem.append($('<span>').addClass('title').text(track.name)); // 아티스트 정보를 뺀 제목만 추가
+            playlistItem.append($('<span>').text(track.artists[0].name).addClass('artist')); // 아티스트 정보 추가
+            playlistItem.append($('<span>').text(track.album.name).addClass('album'));
+            playlistItem.data('album_cover_url', track.album.images[0].url);
+
+            // 추가된 삭제 버튼
+            const deleteButton = $('<button>').text('-').addClass('remove-button').click(function () {
+            const index = playlistTrack.children('.playlist_item').index(playlistItem);
+                    removeFromPlaylist(index);
+            });
+            playlistItem.append(deleteButton);
+
+            // 현재 날짜를 얻기 위한 변수
+            const currentDate = new Date().toLocaleDateString();
+            playlistItem.append($('<span>').text(currentDate).addClass('add_date'));
+
+            playlistItem.append($('<span>').text(msToTime(track.duration_ms)).addClass('time'));
+
+            if (currentNumber === 1) {
+                updatePlaylistCoverImage(track.album.images[0].url);
+            }
+
+            playlistTrack.append(playlistItem);
+
+        }
+
+        function removeFromPlaylist(index) {
+            const playlistTrack = $('.playlist_track');
+            const removedItem = playlistTrack.children('.playlist_item').eq(index);
+
+            // 삭제할 아이템이 1번 노래라면 앨범 이미지를 검은색 네모로 초기화
+            if (index === 0) {
+                $('#playlistCoverImage').attr('src', ''); // 앨범 이미지 초기화
+            }
+
+            removedItem.remove();
+
+            // 남은 플레이리스트 아이템이 없다면 검은색 네모로 초기화
+            if (playlistTrack.children('.playlist_item').length === 0) {
+                $('#playlistCoverImage').attr('src', ''); // 앨범 이미지 초기화
+            } else {
+                // 삭제할 아이템이 1번 노래가 아니라면 첫 번째 노래의 앨범 이미지로 업데이트
+                const firstItemAlbumCover = playlistTrack.children('.playlist_item').eq(0).data('album_cover_url');
+                updatePlaylistCoverImage(firstItemAlbumCover);
+            }
+
+            // 남은 플레이리스트 아이템들의 번호 업데이트
+            updatePlaylistNumbers();
+        }
+
+        // 앨범 커버 이미지 업데이트 함수 추가
+        function updatePlaylistCoverImage(imageUrl) {
+            $('#playlistCoverImage').attr('src', imageUrl);
+        }
+
+        function updatePlaylistNumbers() {
+            const playlistTrack = $('.playlist_track');
+
+            // 모든 플레이리스트 아이템을 가져와서 번호 업데이트
+            playlistTrack.children('.playlist_item').each(function (index, item) {
+                const currentNumber = index + 1;
+                $(item).find('.playlist_number').text(currentNumber);
+            });
+        }
+
+        // checkbox 값 최대 3개 넘기기
+        function submitForm() {
+            const selectedHashtags = [];
+
+            // 체크된 체크박스 확인
+            const checkboxes = document.querySelectorAll('.checkbox_group input[type="checkbox"]');
+            checkboxes.forEach(function (checkbox) {
+                if (checkbox.checked) {
+                    selectedHashtags.push(checkbox.name);
+                }
+            });
+
+            // 최대 3개까지 선택 가능하도록 제한
+            if (selectedHashtags.length > 3) {
+                alert('최대 3개의 해시태그만 선택할 수 있습니다.');
+                return;
+            } else if(selectedHashtags.length < 1) {
+                alert('최소 1개의 해시태그를 선택해야합니다.');
+                return;
+            }
+
+            // 플레이리스트 아이템 정보 수집
+            const playlistItems = [];
+            const playlistTrack = $('.playlist_track .playlist_item');
+
+            const p_title = $('#p_title input').val() || ''; // input 엘리먼트에서 값 가져오기
+            const p_desc = $('#p_desc').val() || ''; // textarea 엘리먼트에서 값 가져오기   
+            
+            playlistTrack.each(function (index, item) {
+                const title = $(item).find('.title').text();
+                const album = $(item).find('.album').text();
+                const artist = $(item).find('.artist').text();
+                const addDate = $(item).find('.add_date').text();
+                const time = $(item).find('.time').text();
+                const album_cover = $(item).data('album_cover_url');
+
+            playlistItems.push({ title: title, album: album, album_cover: album_cover, addDate: addDate, time: time, artist: artist });
+            });
+            console.log('p_title',p_title);
+            console.log('p_desc',p_desc);
+
+            // 선택한 해시태그와 플레이리스트 아이템 정보를 서버로 전송
+            sendToPlaylist(p_title, p_desc, selectedHashtags, playlistItems);
+            console.log('selectedhashtag : ',selectedHashtags);
+            console.log('playlistItems : ',playlistItems);
+        }
+
+        // 백엔드로 값 넘기기
+        function sendToPlaylist(p_title, p_desc, hashtags, playlistItems) {
+
+                $.ajax({
+                    url: '/api/user/playlist_register',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        title: p_title,
+                        description: p_desc,
+                        hashtags: hashtags,
+                        playlistItems: playlistItems
+                    }),
+                    success: function (response) {
+                        console.log('Server Response:', response);
+                        window.location.href = '/user/playlist';
+                    },
+                    error: function (error) {
+                        console.error('Error sending data to server:', error);
+                    }
+                });
+        }
+
+    </script>
+</body>
+</html>

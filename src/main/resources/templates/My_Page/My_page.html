@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Page</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../../static/css/header.css">
+    <link rel="stylesheet" href="../../static/css/footer.css">
+    <link rel="stylesheet" href="../../static/css/my_page.css">
+</head>
+
+<body>
+    <div th:replace="fragments/header :: header"/>
+
+        <div class="container">
+            <div class="my_menu">
+                <label for="expand-menu"><div>메뉴</div></label>
+                <input type="checkbox" id="expand-menu" name="expand-menu">
+                <ul>
+                    <li><a href="/My_Page/My_profile" class="item"><div>프로필</div></a></li>
+                    <li><a href="/My_Page/My_playlist" class="item"><div>등록한 플레이리스트</div></a></li>
+                    <li><a href="/My_Page/My_like" class="item"><div>좋아요</div></a></li>
+                </ul>
+            </div>
+
+        <div class="content" id="dynamic-content">
+        </div>
+
+    </div>
+
+<div th:replace="fragments/footer :: footer"/>
+
+<script>
+    function loadContent(page) {
+        const contentContainer = document.getElementById('dynamic-content');
+        const url = '/My_Page/' + page;
+
+        fetch(url)
+            .then(response => response.text())
+            .then(data => {
+                contentContainer.innerHTML = data;
+            })
+            .catch(error => console.error('Error loading content:', error));
+    }
+
+    loadContent('My_profile');
+</script>
+
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/css/header.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+<div th:fragment="header">
+    <nav class="header">
+        <div class="logo">
+            <a th:href="@{/main}" href="/main">PLAYSHARE</a>
+        </div>
+        <div class="menu menu-right">
+            <div th:if="${isLoggedIn}">
+                <button class="notification-button">알림</button>
+                <div class="dropdown-menu" style="display: none;">
+                    <div class="dropdown-content" id="notificationContent">
+                        <!-- 알림 내용 -->
+                    </div>
+                </div>
+                <a th:href="@{/user/playlist}" href="/user/playlist">PLAYLIST</a>
+                <a th:href="@{/My_Page/My_profile}" href="/My_Page/My_profile">MY PAGE</a>
+                <a th:href="@{/user/logout}" href="/user/logout">LOGOUT</a>
+            </div>
+            <div th:unless="${isLoggedIn}">
+                <a th:href="@{/user/new}" href="/user/new">SIGN IN</a>
+                <a th:href="@{/user/login}" href="/user/login">LOGIN</a>
+            </div>
+        </div>
+    </nav>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/register.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <title>회원가입</title>
+</head>
+
+<body>
+        <div class="password">비밀번호</div>
+        <div class="password_rule" id="passwordRule">비밀번호는 최소 8자 이상이어야 합니다.<br> 숫자 1개와 특수문자 1개 이상을 포함하는 것이 좋습니다.</div>
+        <div class="circle">
+            <div>
+                <input type="password" class="password-input" id="password-input" oninput="checkPasswordRule(this.value)">
+                <span class="password-toggle" onclick="togglePasswordVisibility('password-input')">
+                    <img src="https://img.icons8.com/ios/50/000000/visible.png" alt="eye" width="30" height="30">
+                </span>
+            </div>
+        </div>
+    
+        <div class="password_check">비밀번호 확인</div>
+        <div class="circle">
+            <input type="password" class="password_check-input" id="password_check-input" oninput="checkPassword(this.value)">
+            <span class="password-toggle" onclick="togglePasswordVisibility('password_check-input')">
+                <img src="https://img.icons8.com/ios/50/000000/visible.png" alt="eye" width="30" height="30">
+            </span>
+        </div>
+        <div id="password_check_rule"></div>
+
+        <div class="name">이름</div>
+        <div class="circle">
+            <input type="text" class="name-input" id="name-input">
+        </div>
+    <div class="favorite_music">좋아하는 음악을 선택해주세요</div>
+
+    <label class="checkbox_group">
+        <input type="checkbox" name="K-POP" id="K-POP">
+            <label for="K-POP">K-POP</label>
+        <input type="checkbox" name="J-POP" id="J-POP">
+            <label for="J-POP">J-POP</label>
+        <input type="checkbox" name="POP" id="POP">
+            <label for="POP">POP</label>
+        <input type="checkbox" name="발라드" id="발라드">
+            <label for="발라드">발라드</label>
+        <input type="checkbox" name="락" id="락">
+            <label for="락">락</label> <br>
+        <input type="checkbox" name="힙합" id="힙합">
+            <label for="힙합">힙합</label>
+        <input type="checkbox" name="인디" id="인디">
+            <label for="인디">인디</label>
+        <input type="checkbox" name="클래식" id="클래식">
+            <label for="클래식">클래식</label>
+        <input type="checkbox" name="재즈" id="재즈">
+            <label for="재즈">재즈</label>
+        <input type="checkbox" name="레게" id="레게">
+            <label for="레게">레게</label>
+    </label>
+
+    <div class="terms">약관</div>
+    <div class="circle_marketing">
+        <div class="marketing_checkbox_group">
+            <input type="checkbox" name="marketing" id="marketing">
+            <label for="marketing">마케팅 메시지 수신 동의</label>
+        </div>
+    </div>
+    <div class="circle_marketing">
+        <div class="marketing_checkbox_group">
+            <input type="checkbox" name="marketing" id="marketing">
+            <label for="marketing">필수 개인 정보 수집 및 이용</label>
+        </div>
+    </div>
+    <div class="circle_marketing">
+        <div class="marketing_checkbox_group">
+            <input type="checkbox" name="marketing" id="marketing">
+            <label for="marketing">PLAYSHARE 사용 약관</label>
+        </div>
+    </div>
+
+    <button class="register" onclick="SubmitForm()">
+        <span class="register_text">가입하기</span>
+    </button>
+
+    <script>
+
+        let urlParams;
+
+        // sign_up 페이지에서 넘어온 이메일 값 확인
+        window.onload = function() {
+            urlParams = new URLSearchParams(window.location.search);
+
+            // 'email' 파라미터가 있는지 확인
+            if (urlParams.has('email')) {
+                // 'email' 파라미터 값을 가져와서 변수에 저장
+                const emailFromURL = urlParams.get('email');
+
+            }
+        };
+
+        // 비밀번호 조건 확인
+        function checkPasswordRule(password) {
+            const passwordRule = document.getElementById('passwordRule');
+
+            const hasMinimumLength = password.length >= 8;
+            const hasNumber = /\d/.test(password);
+            const hasSpecialCharacter = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+            if (hasNumber && hasSpecialCharacter) {
+                passwordRule.textContent = '';
+            } else if (!hasMinimumLength) {
+                passwordRule.textContent = '비밀번호는 최소 8자 이상이어야 합니다.';
+            } else  {
+                passwordRule.textContent = '숫자 1개와 특수문자 1개 이상을 포함하세요.';
+            }
+        }
+
+        // 비밀번호 일치하는지 확인
+        function checkPassword(password) {
+            const password_check_input = document.getElementById('password_check-input');
+            const password_check_rule = document.getElementById('password_check_rule');
+
+            const originalPassword = document.querySelector('.password-input').value;
+
+            if (password === originalPassword) {
+                password_check_rule.textContent = '';
+            } else {
+                password_check_rule.textContent = '비밀번호가 일치하지 않습니다.';
+            }
+        }
+
+        // 백엔드에 값 넘기기
+        function SubmitForm() {
+            const selectedHashtags = [];
+            const selectedMarketing = [];
+
+            // 좋아하는 음악 체크박스 확인
+            const favoriteMusicCheckboxes = document.querySelectorAll('.checkbox_group input[type="checkbox"]');
+            favoriteMusicCheckboxes.forEach(function (checkbox) {
+                if (checkbox.checked) {
+                    selectedHashtags.push(checkbox.name);
+                }
+            });
+
+            // 마케팅 체크박스 확인
+            const marketingCheckboxes = document.querySelectorAll('.marketing_checkbox_group input[type="checkbox"]');
+            marketingCheckboxes.forEach(function (checkbox) {
+                if (checkbox.checked) {
+                    selectedMarketing.push(checkbox.name);
+                }
+            });
+
+            // 최대 3개까지 선택 가능하도록 제한
+            if (selectedHashtags.length > 3) {
+                alert('최대 3개의 좋아하는 음악을 선택할 수 있습니다.');
+                return;
+            } else if (selectedHashtags.length < 1) {
+                alert('최소 1개 이상의 좋아하는 음악을 선택해야합니다.');
+                return;
+            } else if (selectedMarketing.length < 3) {
+                alert('약관을 모두 동의해주세요.');
+                return;
+            }
+
+            // 이름과 비밀번호 확인 값 가져오기
+            const emailFromURL = urlParams.get('email');
+            const name_input = document.getElementById('name-input');
+            const password_check_input = document.getElementById('password_check-input');
+
+            const enteredName = name_input.value;
+            const enteredPasswordConfirmation = password_check_input.value;
+
+            const hashtag1 = selectedHashtags[0] || '';
+            const hashtag2 = selectedHashtags[1] || '';
+            const hashtag3 = selectedHashtags[2] || '';
+
+
+            $.ajax({
+                url: '/api/user/register',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    email : emailFromURL,
+                    hashtag1: hashtag1,
+                    hashtag2: hashtag2,
+                    hashtag3: hashtag3,
+                    name: enteredName,
+                    password: enteredPasswordConfirmation,
+                }),
+                success: function(response) {
+                    alert("회원가입이 완료되었습니다.");
+                    window.location.href = "/main";
+                },
+                error: function(error) {
+                    alert("회원가입이 실패했습니다. 다시 시도해주세요.");
+                    window.location.href = "/main";
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

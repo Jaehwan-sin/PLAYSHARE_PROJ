@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/sign_up.css">
+    <title>회원가입</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+
+<body>
+    <div class="center_parent">
+        <h2 class="center_text">가입하고 원하는<br>플레이리스트를<br>감상하세요</h2>
+    </div>
+    <div class="login">
+        <div class="email">이메일 주소</div>
+        <div class="circle">
+            <input type="text" class="email-input" placeholder="이메일을 입력하세요">
+        </div>
+    </div>
+    <div class="circle_2">
+        <button class="next" onclick="submitEmail()">다음</button>
+    </div>
+    <div class="final_text">
+        <span class="bold">이미 계정이 있나요?</span> <a href="/user/login">여기에서 로그인하세요</a>
+    </div>
+</body>
+
+<script>
+    function submitEmail() {
+        // email-input의 값을 가져와서 AJAX를 이용해 POST 방식으로 서버에 전송
+        var emailInput = document.querySelector('.email-input');
+        var email = emailInput.value;
+
+        // 간단한 이메일 형식을 확인하는 정규 표현식
+	    var emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
+
+        if (!emailRegex.test(email)) {
+            // 이메일 형식이 유효하지 않은 경우 오류 메시지 표시
+            alert('올바른 이메일 형식이 아닙니다.');
+            return;
+        }
+
+        $.ajax({
+            url: '/user/new',  
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ email: email }),
+            success: function(response) {
+                console.log('이메일 전송 성공:', response);
+                window.location.href = "/user/register?email=" + email;
+            },
+            error: function(error) {
+                console.error('이메일 전송 실패:', error);
+            }
+        });
+    }
+</script>
+
+</html>

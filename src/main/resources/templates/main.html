@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/sockjs/1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="/static/js/notifications.js"></script>
+    <link rel="stylesheet" href="../static/css/header.css">
+    <link rel="stylesheet" href="../static/css/footer.css">
+    <link rel="stylesheet" href="../static/css/main.css">
+    <title>PLAYSHARE</title>
+    <script th:inline="javascript">
+        var userId = /*[[${userId}]]*/ 'dummyUserId'; // Thymeleaf 변수를 JavaScript 변수로 설정
+    </script>
+</head>
+<body>
+
+<div th:insert="~{fragments/header :: header}"></div>
+
+<div class="main_banner"><img src="../static/images/spotify.png"></div>
+<div class="weekly">
+    <div class="weekly_playlist">WEEKLY POPULAR PLAYLIST</div>
+    <div class="circle-container" id="weeklyArtistsContainer"></div>
+</div>
+<div class="new">
+    <div class="new_playlist">NEW PLAYLIST</div>
+    <div class="circle-container" id="newArtistsContainer"></div>
+</div>
+
+<div th:insert="~{fragments/footer :: footer}"></div>
+
+<script>
+    const clientId = 'de7ba1a62d644bd3b1f8e063580cb737';
+    const clientSecret = 'ba0bccc3e1d24bcfb6be5693848f3d76';
+    let accessToken = '';
+
+    // 토큰 가져오기
+    $.ajax({
+        url: 'https://accounts.spotify.com/api/token',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': 'Basic ' + btoa(clientId + ':' + clientSecret),
+        },
+        data: {
+            'grant_type': 'client_credentials'
+        },
+        success: function (tokenResponse) {
+            accessToken = tokenResponse.access_token;
+            console.log('accessToken = ', accessToken);
+
+            // 한국 인기 아티스트 가져오기
+            $.ajax({
+                url: 'https://api.spotify.com/v1/browse/categories/toplists/playlists?country=KR',
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken
+                },
+                success: function (response) {
+                    console.log('Spotify API Response:', response);
+
+                    if (response.playlists && response.playlists.items) {
+                        const topPlaylists = response.playlists.items.slice(0, 8);
+
+                        displayPopularArtists(topPlaylists);
+                        console.log('topPlaylists:', topPlaylists);
+                    } else {
+                        console.error('No playlists found in the Spotify API response.');
+                    }
+                },
+                error: function (error) {
+                    console.error('Error fetching popular artists:', error);
+                }
+            });
+        },
+        error: function (error) {
+            console.error('Error fetching Spotify access token:', error);
+        }
+    });
+
+    function displayPopularArtists(playlists) {
+        console.log('displayPopularArtists called');
+        console.log('AccessToken:', accessToken);
+        console.log('playlists:', playlists);
+
+        const weeklyArtistsContainer = $('#weeklyArtistsContainer');
+        const newArtistsContainer = $('#newArtistsContainer');
+
+        console.log('weeklyArtistsContainer' + weeklyArtistsContainer.text());
+        console.log('newArtistsContainer' + newArtistsContainer.text());
+
+        playlists.forEach(function (playlist, index) {
+            const artistName = playlist.name;
+            const circleContainer = index < 4 ? weeklyArtistsContainer : newArtistsContainer;
+
+            $.ajax({
+                url: `https://api.spotify.com/v1/playlists/${playlist.id}/images`,
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken
+                },
+                success: function (images) {
+                    console.log('AJAX success'); // AJAX 요청 성공 확인
+                    const imageUrl = images[0].url;
+
+                    const circle = $('<div>').addClass('circle');
+                    const artistImage = $('<img>').attr('src', imageUrl).attr('alt', artistName);
+                    const textContainer = $('<div>').addClass('text-container');
+                    const artistNameParagraph = $('<p>').text(artistName);
+
+                    circle.click(function () {
+                        openSearchLink(playlist.external_urls.spotify);
+                    });
+
+                    textContainer.append(artistNameParagraph);
+                    circle.append(artistImage);
+                    circle.append(textContainer);
+                    circleContainer.append(circle);
+                },
+                error: function (error) {
+                    console.error('Error fetching artist images:', error);
+                }
+            });
+        });
+    }
+
+    function openSearchLink(playlistUrl) {
+        window.location.href = playlistUrl;
+    }
+</script>
+
+</body>
+</html>

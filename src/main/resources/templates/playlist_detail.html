@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/header.css">
+    <link rel="stylesheet" href="/static/css/footer.css">
+    <link rel="stylesheet" href="/static/css/playlist_detail.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="/static/js/notifications.js"></script>
+    <script th:inline="javascript">
+        var userId = /*[[${userId}]]*/ 'dummyUserId'; // Thymeleaf 변수를 JavaScript 변수로 설정
+    </script>
+    <title>플레이리스트 상세보기</title>
+</head>
+
+<body>
+
+<div th:replace="fragments/header :: header"/>
+
+<div class="main-container">
+    <span class="intro_text">플레이리스트를 들어보고<br> 다양한 음악을 즐겨보세요</span>
+    <div class="white_background">
+        <div class="playlist_header">
+            <span class="playlist" th:text="${playlist_title}"/>
+            <span class="description" th:text="${description}"/>
+        </div>
+        <div class="underline"></div>
+        <!-- 플레이리스트 목록을 표시할 부분 -->
+        <div class="album_cover" th:each="music : ${musicList}">
+            <!-- 플레이리스트 정보 -->
+            <img th:src="${music.album_cover_url}" alt="Thumbnail Image" width="200" height="200"/>
+            <div class="playlist_info_container">
+                <div class="playlist_text">
+                    <div class="playlist_name" th:text="${music.title}"></div>
+                    <div class="playlist_artist" th:text="${music.artist}"></div>
+                    <div class="playlist_album" th:text="${music.album}"></div>
+                    <div class="playlist_time" th:text="${music.time}"></div>
+                    <!-- Spotify 재생 버튼 -->
+                    <input type="hidden" th:value="${music.spotify_uri}" id="spotifyUri" />
+                    <button class="play_button" onclick="playSpotify(this)">재생</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="command">
+            <a href="" role="button" onclick="onLikeButtonClick()">
+                <span class="heart_icon">
+                    <img src="/static/images/red_heart.png" alt="하트">
+                </span>
+            </a>
+            <span>좋아요</span>
+            <span id="likeCountSpan" th:text="${likeCount}"></span>
+            <span class="command_icon">
+                <img src="/static/images/comment_icon.png" alt="댓글">
+            </span>
+            <span>댓글</span>
+            <span id="commentCountSpan" th:text="${commentCount}"></span>
+            <div class="command_underline"></div>
+
+            <div class="comment-list">
+                <div th:each="comment : ${comments}">
+                    <div class="comment-contents" th:text="${comment.comments}"></div>
+                    <div class="comment-commenter" th:text="${comment.user.username}"></div>
+                    <input type="hidden" th:value="${comment.id}" id="commentId" />
+                    <a href="" role="button" class="btn_edit" onclick="onEditButtonClick()">수정</a>
+                    <a href="" role="button" class="btn_delete" onclick="onDeleteButtonClick()">삭제</a>
+                    <div class="comment-registrationDate" th:text="${#temporals.format(comment.registration_date, 'yyyy-MM-dd HH:mm')}"></div>
+                </div>
+            </div>
+
+            <div class="CommentWriter">
+                <textarea placeholder="댓글을 남겨보세요" class="comment_text"></textarea>
+                <a href="" role="button" class="btn_register" onclick="onRegisterButtonClick()">등록</a>
+            </div>
+
+            <div class="prev_next">
+                <div id="prev">이전글
+                    <div th:if="${previousPlaylist != null}">
+                        <a th:href="@{/user/playlist_detail/{id}(id=${previousPlaylist.id})}">
+                            <img th:src="${previousPlaylist.thumbnail}" alt="Previous Thumbnail" width="70" height="70"/>
+                            <div class="info">
+                                <span class="title" th:text="${previousPlaylist.title}"></span>
+                                <span class="description" th:text="${previousPlaylist.description}"></span>
+                            </div>
+                        </a>
+                        <div class="date" th:text="${#temporals.format(previousPlaylist.registration_date, 'MM-dd')}"></div>
+                    </div>
+                    <div th:if="${previousPlaylist == null}">
+                        <span>이전글이 없습니다.</span>
+                    </div>
+                </div>
+                <div class="underline"></div>
+                <div id="next">다음글
+                    <div th:if="${nextPlaylist != null}">
+                        <a th:href="@{/user/playlist_detail/{id}(id=${nextPlaylist.id})}">
+                            <img th:src="${nextPlaylist.thumbnail}" alt="Next Thumbnail" width="70" height="70"/>
+                            <div class="info">
+                                <span class="title" th:text="${nextPlaylist.title}"></span>
+                                <span class="description" th:text="${nextPlaylist.description}"></span>
+                            </div>
+                        </a>
+                        <div class="date" th:text="${#temporals.format(nextPlaylist.registration_date, 'MM-dd')}"></div>
+                    </div>
+                    <div th:if="${nextPlaylist == null}">
+                        <span>다음글이 없습니다.</span>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+</div>
+
+    <div th:replace="fragments/footer :: footer"/>
+</body>
+
+<script>
+    var isLiked = false; 
+
+    $(document).ready(function () {
+        var playlistId = getPlaylistIdFromUrl();
+        checkLikeStatus(playlistId);
+    });
+
+    function getPlaylistIdFromUrl() {
+        var url = window.location.href;
+
+        // URL에서 playlistId를 추출하는 정규표현식
+        var regex = /\/user\/playlist_detail\/(\d+)/;
+        var match = url.match(regex);
+
+        // match 배열에서 playlistId를 가져옴
+        var playlistId = match ? match[1] : null;
+
+        return playlistId;
+    }
+
+    function onRegisterButtonClick() {
+        var playlistId = getPlaylistIdFromUrl();
+        var comment = $('.comment_text').val();
+
+        if (comment.trim() !== '') {
+            registerComment(playlistId, comment);
+        }
+    }
+
+    function registerComment(playlistId, comment) {
+        $.ajax({
+            type: 'POST',
+            url: '/api/user/comments',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                playlistId: playlistId,
+                comment: comment
+            }),
+            success: function(response) {
+                location.reload(true);
+                console.log(response);
+            },
+            error: function(error) {
+                location.reload(true);
+                console.error(error);
+            }
+        });
+    }
+
+    function onEditButtonClick() {
+            var commentId = $('#commentId').val();
+
+            var commentContents = prompt('댓글을 수정하세요:', '');
+
+            if (commentContents !== null) { 
+                var playlistId = getPlaylistIdFromUrl();
+
+                $.ajax({
+                    type: 'PUT',
+                    url: '/api/user/comment_edit/' + commentId,
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        playlistId: playlistId,
+                        comment: commentContents
+                    }),
+                    success: function(response) {
+                        location.reload(true);
+                        console.log(response);
+                    },
+                    error: function(error) {
+                        location.reload(true);
+                        console.error(error);
+                    }
+                });
+            }
+        }
+
+        function onDeleteButtonClick() {
+            var commentId = $('#commentId').val();
+
+            var confirmation = confirm("댓글을 삭제하시겠습니까?");
+
+            if (confirmation) {
+                var playlistId = getPlaylistIdFromUrl();
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/api/user/comments_delete/' + commentId,
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        playlistId: playlistId
+                    }),
+                    success: function(response) {
+                        location.reload(true);
+                        console.log(response);
+                    },
+                    error: function(error) {
+                        location.reload(true);
+                        console.error(error);
+                    }
+                });
+            }
+        }
+
+        // 좋아요를 눌렀는지 안 눌렀는지 먼저 확인
+        function checkLikeStatus(playlistId) {
+            $.ajax({
+                type: 'GET',
+                url: '/api/user/like/' + playlistId,
+                success: function(response) {
+                    if (response === "Liked") {
+                        isLiked = true;
+                    } else {
+                        isLiked = false;
+                    }
+                },
+                error: function(error) {
+                    console.error(error);
+                }
+            });
+        }
+
+        var isLiked = false; 
+
+        function onLikeButtonClick() {
+            var playlistId = getPlaylistIdFromUrl();
+
+            if (isLiked) {
+                alert('좋아요를 취소하였습니다.');
+                unlikePlaylist(playlistId);
+            } else {
+                likePlaylist(playlistId);
+            }
+        }
+
+        function likePlaylist(playlistId) {
+            $.ajax({
+                type: 'POST',
+                url: '/api/user/like',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    playlistId: playlistId,
+                }),
+                success: function(response) {
+                    console.log(response);
+                    isLiked = true; 
+                },
+                error: function(error) {
+                    console.error(error);
+                }
+            });
+        }
+
+        function unlikePlaylist(playlistId) {
+            $.ajax({
+                type: 'DELETE',
+                url: '/api/user/unlike',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    playlistId: playlistId,
+                }),
+                success: function(response) {
+                    console.log(response);
+                    isLiked = true; 
+                },
+                error: function(error) {
+                    console.error(error);
+                }
+            });
+        }
+
+    // 음악을 재생하는 함수
+    function playSpotify(button) {
+        var spotifyUri = button.parentElement.querySelector('#spotifyUri').value;
+
+        // Spotify Web Player를 열고 특정 URI의 음악을 재생
+        window.open('https://open.spotify.com/embed/track/' + spotifyUri);
+    }
+
+</script>
+
+</html>

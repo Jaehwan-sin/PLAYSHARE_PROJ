@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../../static/css/header.css">
+    <link rel="stylesheet" href="../../static/css/footer.css">
+    <link rel="stylesheet" href="../../static/css/my_profile.css">
+    <title>나의 프로필</title>
+</head>
+
+<body>
+
+    <div th:replace="fragments/header :: header"/>
+
+    <div class="container">
+        <div class="my_menu">
+            <label for="expand-menu"><div>메뉴</div></label>
+            <input type="checkbox" id="expand-menu" name="expand-menu">
+            <ul>
+                <li><a href="/My_Page/My_profile" class="item"><div>프로필</div></a></li>
+                <li><a href="/My_Page/My_playlist" class="item"><div>등록한 플레이리스트</div></a></li>
+                <li><a href="/My_Page/My_like" class="item"><div>좋아요</div></a></li>
+            </ul>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2">기본 회원정보</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>아이디</td>
+                    <td th:text="${userId}"></td>
+                </tr>
+                <tr>
+                    <td>비밀번호</td>
+                    <td>
+                        <span th:utext="${'&#8226;'.repeat(8)}"></span>
+                        <button>비밀번호 변경</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>이름</td>
+                    <td th:text="${name}"></td>
+                </tr>
+                <tr>
+                    <td>좋아하는 장르</td>
+                    <td th:text="${hashtags}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
