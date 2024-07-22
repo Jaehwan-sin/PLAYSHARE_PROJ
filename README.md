@@ -34,7 +34,7 @@
 ![Github Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)
 
 ## 프로젝트 아키텍처
-
+![Image](src/main/resources/static/images/프로젝트%20아키텍처.png)
 
 ## 프로젝트 성과
 ### <span style="color:#E67E22">1. JPA와 DB 연관관계</span>
