@@ -6,6 +6,7 @@ import com.tech.spotify.domain.Notification;
 import com.tech.spotify.domain.Playlist;
 import com.tech.spotify.domain.User;
 import com.tech.spotify.dto.CommentRequest;
+import com.tech.spotify.exception.CommentNotFoundException;
 import org.hibernate.dialect.TiDBDialect;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -207,4 +208,31 @@ public class CommentServiceTest {
         verify(commentRepository, never()).save(any(Comments.class));
         verify(notificationService, never()).saveNotification(any(Notification.class));
     }
+
+    @Test
+    public void 댓글수정_실패_존재하지않는댓글() throws Exception {
+        // given
+        Long commentId = 99L; // 존재하지 않는 댓글 ID
+        CommentRequest commentRequest = new CommentRequest();
+        commentRequest.setComment("수정된 댓글 내용");
+
+        User loginUser = new User();
+        loginUser.setId(1L);
+        loginUser.setUsername("testUser");
+
+        when(commentRepository.findById(commentId)).thenReturn(Optional.empty());
+
+        // when
+        Exception exception = assertThrows(Exception.class, () -> {
+            commentService.editComment(commentRequest, commentId, loginUser);
+        });
+
+        // then
+        String expectedMessage = "댓글을 찾을 수 없습니다.";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+        verify(commentRepository, never()).save(any(Comments.class));
+    }
+
 }
